@@ -1,0 +1,20 @@
+---
+hard_reset: True
+real_run: False
+keys_directory: '~/pglulz'
+signing_key:
+  name: 'Ed Snowden'
+  email: 'esnowden@nsa.gov'
+groups_to_sign:
+  1:
+    name: 'nsa'
+    matching: 'nsa.gov'
+    comment: 'Oh hai!'
+  2:
+    name: 'white house'
+    matching: 'whitehouse.gov'
+    comment: 'Oh hai!'
+  3:
+    name: 'new york times'
+    matching: 'nyt.com'
+    comment: 'Oh hai!'
