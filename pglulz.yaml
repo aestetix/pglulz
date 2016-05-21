@@ -1,5 +1,6 @@
 ---
 hard_reset: True
+keyserver: pgp.mit.edu
 real_run: False
 keys_directory: '~/pglulz'
 signing_key:

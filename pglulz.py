@@ -1,14 +1,10 @@
 # Pretty Good Lulz, aka PGLulz
 # prepared by aestetix for berlinsides 2016
 #
-# Installation note:
-# While this depends on the gnupg pip library, it is also necessary to install
-# the pull request https://github.com/isislovecruft/python-gnupg/pull/20 to
-# enable the search_keys functionality.
-# TODO: make a github repo and create requirements.txt
+# Installation note: to make sure you run pip install -r requirements.txt before
+# running
 
 import os
-import gnupg
 import yaml
 import subprocess
 
@@ -22,6 +18,17 @@ with open('pglulz.yaml', 'r') as stream:
 # Check flag to wipe out pre-existing keys
 if 'hard_reset' in yaml_data and yaml_data['hard_reset']:
     os.system('rm -rf ' + yaml_data['keys_directory'] + '/*')
+
+# total hack because it's unclear how to change the default keyserver
+if 'keyserver' in yaml_data:
+    os.system('for x in $(find src/); \
+        do perl -p -i -e \'s/subkeys.pgp.net/' + yaml_data['keyserver'] + '/g\' $x; done')
+# remove log level unless otherwise noted
+if not 'logging' in yaml_data:
+    os.system('perl -p -i -e \'s/create_logger\(10/create_logger\(0/g\' \
+    src/gnupg/gnupg/_util.py')
+    os.system('mkdir -p gnupg/test')
+import gnupg
 
 # Create new key for signing
 gpg = gnupg.GPG(
@@ -53,7 +60,7 @@ if yaml_data['real_run'] == True:
     print 'Uploading the new key to the keyserver'
     gpg.send_keys(key)
 else:
-    print 'This is where we\' upload our new key to the keyserver'
+    print 'This is where we upload our new key to the keyserver'
 
 # This loop is the meat of the project:
 # 1. We iterate through each group, getting the name (for display) and
