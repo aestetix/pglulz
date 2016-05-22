@@ -4,7 +4,6 @@
 # Installation note: to make sure you run pip install -r requirements.txt before
 # running
 
-import os
 import yaml
 import subprocess
 
@@ -15,20 +14,24 @@ with open('pglulz.yaml', 'r') as stream:
     except yaml.YAMLERROR as exc:
       print (exc)
 
-# Check flag to wipe out pre-existing keys
-if 'hard_reset' in yaml_data and yaml_data['hard_reset']:
-    os.system('rm -rf ' + yaml_data['keys_directory'] + '/*')
+# Fixing up the gnupg library a little bit
 
 # total hack because it's unclear how to change the default keyserver
 if 'keyserver' in yaml_data:
-    os.system('for x in $(find src/); \
-        do perl -p -i -e \'s/subkeys.pgp.net/' + yaml_data['keyserver'] + '/g\' $x; done')
+    subprocess.call('for x in $(find src/ -type f); \
+        do perl -p -i -e \'s/subkeys.pgp.net/' + yaml_data['keyserver'] \
+        + '/g\' $x; done', shell=True)
 # remove log level unless otherwise noted
 if not 'logging' in yaml_data:
-    os.system('perl -p -i -e \'s/create_logger\(10/create_logger\(0/g\' \
-    src/gnupg/gnupg/_util.py')
-    os.system('mkdir -p gnupg/test')
+    subprocess.call('perl -p -i -e \'s/create_logger\(10/create_logger\(0/g\' \
+    src/gnupg/gnupg/_util.py',shell=True)
+    subprocess.call('mkdir -p gnupg/test',shell=True)
+
 import gnupg
+
+# Check flag to wipe out pre-existing keys
+if 'hard_reset' in yaml_data and yaml_data['hard_reset']:
+    subprocess.call('rm -rf ' + yaml_data['keys_directory'] + '/*', shell=True)
 
 # Create new key for signing
 gpg = gnupg.GPG(
@@ -58,7 +61,8 @@ gpg.options = ['--batch', '--with-colons']
 # Upload our key
 if yaml_data['real_run'] == True:
     print 'Uploading the new key to the keyserver'
-    gpg.send_keys(key)
+    subprocess.call('gpg --keyserver ' + yaml_data['keyserver'] +
+        ' --send-keys ' + str(key), shell=True)
 else:
     print 'This is where we upload our new key to the keyserver'
 
@@ -81,8 +85,8 @@ for x in yaml_data['groups_to_sign']:
     # Loop through keys and sign them
     for y in key_list:
         gpg.recv_keys(y['keyid'])
-        print 'Signing key', y['keyid'][-8:], ' with comment', \
-            yaml_data['groups_to_sign'][x]['comment']
+        print 'Signing key', key_list.index(y)+1, 'of', len(key_list), \
+        'with comment', yaml_data['groups_to_sign'][x]['comment']
         # This is rather hackish, but the lib doesn't offer another way
         subprocess.call('gpg --yes --batch -u ' + str(key) + \
             ' --sign-key ' + str(y['keyid']), shell=True, \
@@ -91,6 +95,5 @@ for x in yaml_data['groups_to_sign']:
         # All done here, let's ship it!
         if yaml_data['real_run'] == True:
             print 'Uploading our new trust relationship :)'
-            gpg.send_keys(y['keyid'])
-        else:
-            print 'And now we would upload our new trust relationship :)'
+            subprocess.call('gpg --keyserver ' + yaml_data['keyserver'] \
+            + ' --send-key ' + str(y['keyid']), shell=True)
