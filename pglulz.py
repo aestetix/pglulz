@@ -85,8 +85,7 @@ for x in yaml_data['groups_to_sign']:
     # Loop through keys and sign them
     for y in key_list:
         gpg.recv_keys(y['keyid'])
-        print 'Signing key', key_list.index(y)+1, 'of', len(key_list), \
-        'with comment', yaml_data['groups_to_sign'][x]['comment']
+        print 'Signing key', key_list.index(y)+1, 'of', len(key_list)
         # This is rather hackish, but the lib doesn't offer another way
         subprocess.call('gpg --yes --batch -u ' + str(key) + \
             ' --sign-key ' + str(y['keyid']), shell=True, \

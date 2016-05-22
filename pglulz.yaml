@@ -2,7 +2,7 @@
 hard_reset: True
 keyserver: pgp.mit.edu
 real_run: False
-keys_directory: 'CHANGE TO BE YOUR KEYSTORE HOME'
+keys_directory: key_directory
 signing_key:
   name: 'Ed Snowden'
   email: 'esnowden@nsa.gov'
@@ -10,8 +10,6 @@ groups_to_sign:
   1:
     name: 'Buckaroo Banzai Badguys'
     matching: 'buckaroobanzai.com'
-    comment: 'Oh hai!'
   2:
     name: 'John Small Berries'
     matching: 'John Small Berries'
-    comment: 'Oh hai!'
