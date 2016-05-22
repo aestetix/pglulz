@@ -1,18 +1,20 @@
-# Pretty Good Lulz, aka PGLulz
-# prepared by aestetix for berlinsides 2016
-#
-# Installation note: to make sure you run pip install -r requirements.txt before
-# running
+#!/usr/bin/env python
+"""
+Pretty Good Lulz, aka PGLulz
+prepared by aestetix for berlinsides 2016
 
-import yaml
+Make sure you run pip install -r requirements.txt before running
+"""
+
 import subprocess
+import yaml
 
 # Open config file
 with open('pglulz.yaml', 'r') as stream:
     try:
-      yaml_data = yaml.load(stream)
-    except yaml.YAMLERROR as exc:
-      print (exc)
+        yaml_data = yaml.load(stream)
+    except yaml.YAMLError as exc:
+        print exc
 
 # Fixing up the gnupg library a little bit
 
@@ -23,9 +25,9 @@ if 'keyserver' in yaml_data:
         + '/g\' $x; done', shell=True)
 # remove log level unless otherwise noted
 if not 'logging' in yaml_data:
-    subprocess.call('perl -p -i -e \'s/create_logger\(10/create_logger\(0/g\' \
-    src/gnupg/gnupg/_util.py',shell=True)
-    subprocess.call('mkdir -p gnupg/test',shell=True)
+    subprocess.call('perl -p -i -e \'s/create_logger\\(10/create_logger\\(0/g\' \
+    src/gnupg/gnupg/_util.py', shell=True)
+    subprocess.call('mkdir -p gnupg/test', shell=True)
 
 import gnupg
 
@@ -35,20 +37,20 @@ if 'hard_reset' in yaml_data and yaml_data['hard_reset']:
 
 # Create new key for signing
 gpg = gnupg.GPG(
-    binary  = '/usr/bin/gpg' if not 'binary' in yaml_data \
+    binary='/usr/bin/gpg' if not 'binary' in yaml_data \
         else yaml_data['binary'],
-    homedir = '~/pgplulz' if not 'keys_directory' in yaml_data \
+    homedir='~/pgplulz' if not 'keys_directory' in yaml_data \
         else yaml_data['keys_directory'],
-    keyring = 'pubring.gpg' if not 'keyring' in yaml_data \
+    keyring='pubring.gpg' if not 'keyring' in yaml_data \
         else yaml_data['keyring'],
-    secring = 'secring.gpg' if not 'secring' in yaml_data \
+    secring='secring.gpg' if not 'secring' in yaml_data \
         else yaml_data['secring'])
 
 input_data = gpg.gen_key_input(
     key_type='RSA',
     key_length=2048,
-    name_real = yaml_data['signing_key']['name'],
-    name_email= yaml_data['signing_key']['email'])
+    name_real=yaml_data['signing_key']['name'],
+    name_email=yaml_data['signing_key']['email'])
 
 key = gpg.gen_key(input_data)
 
@@ -59,10 +61,10 @@ print 'Created key', str(key)[-8:], 'for', yaml_data['signing_key']['name'], \
 gpg.options = ['--batch', '--with-colons']
 
 # Upload our key
-if yaml_data['real_run'] == True:
+if yaml_data['real_run'] is True:
     print 'Uploading the new key to the keyserver'
     subprocess.call('gpg --keyserver ' + yaml_data['keyserver'] +
-        ' --send-keys ' + str(key), shell=True)
+                    ' --send-keys ' + str(key), shell=True)
 else:
     print 'This is where we upload our new key to the keyserver'
 
@@ -92,7 +94,7 @@ for x in yaml_data['groups_to_sign']:
             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         # All done here, let's ship it!
-        if yaml_data['real_run'] == True:
+        if yaml_data['real_run'] is True:
             print 'Uploading our new trust relationship :)'
             subprocess.call('gpg --keyserver ' + yaml_data['keyserver'] \
             + ' --send-key ' + str(y['keyid']), shell=True)
