@@ -3,7 +3,7 @@ auto-sign all matching keys that exist in a keyserver.
 
 * To install (in virtualenv)
 
-  `apt-get install python-dev libyaml-dev python-virtualenv`
+  `apt-get install python-dev libyaml-dev python-virtualenv rng-tools`
 
   `git clone $this_repo`
 
