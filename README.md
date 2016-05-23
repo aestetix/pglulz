@@ -1,13 +1,19 @@
 This is a fun little script that will generate a custom gpg key and proceed to
 auto-sign all matching keys that exist in a keyserver.
 
-To install (in virtualenv):
-apt-get install python-dev libyaml-dev python-virtualenv
-git clone $this_repo
-cd $this_repo
-virtualenv .
-source bin/activate
-pip install -r requirements.txt
+* To install (in virtualenv)
+
+  `apt-get install python-dev libyaml-dev python-virtualenv`
+
+  `git clone $this_repo`
+
+  `cd $this_repo`
+
+  `virtualenv .`
+
+  `source bin/activate`
+
+  `pip install -r requirements.txt`
 
 Make any changes you need to pglulz.yaml, and then run
 python pglulz.py
